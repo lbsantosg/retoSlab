@@ -127,6 +127,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-#Secret keys 
-# /app/app/settings.py
