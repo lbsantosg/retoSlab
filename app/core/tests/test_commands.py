@@ -14,7 +14,7 @@ class CommandsTests(TestCase):
     def test_wait_for_db_ready(self):
         """
         Tests What happens when we call our command and the db is already available.
-        Tests waiting for db when db is available
+        Test waiting for db when db is available
         """
         with patch('django.db.utils.ConnectionHandler.__getitem__') as gi:
             gi.return_value = True
@@ -26,7 +26,7 @@ class CommandsTests(TestCase):
         """
         Cheks that the wait_for_db command will try the db 5 and on the 6th
         it will be succesfull and we will contintue
-        Test wating for db
+        Test waiting for db
         """
 
         with patch('django.db.utils.ConnectionHandler.__getitem__') as gi:
