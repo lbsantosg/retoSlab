@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 #Secret keys 
-/app/app/settings.py
+# /app/app/settings.py
