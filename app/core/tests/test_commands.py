@@ -13,8 +13,8 @@ class CommandsTests(TestCase):
 
     def test_wait_for_db_ready(self):
         """
-        Tests What happens when we call our command and the db is already available.
-        Test waiting for db when db is available
+        Tests What happens when we call our command and the db is already
+        available. Test waiting for db when db is available
         """
         with patch('django.db.utils.ConnectionHandler.__getitem__') as gi:
             gi.return_value = True
