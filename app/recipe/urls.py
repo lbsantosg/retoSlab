@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from myrecipe import views
+from recipe import views
 
 """
     A Default router is a feature of the Django rest framework

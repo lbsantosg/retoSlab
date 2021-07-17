@@ -3,7 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from core.models import Tag, Ingredient
-from myrecipe import serializers
+from recipe import serializers
 
 
 class TagViewSet(viewsets.GenericViewSet,
