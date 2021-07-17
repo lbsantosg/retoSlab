@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Ingredient 
+from core.models import Ingredient
 
 from recipe.serializers import IngredientSerializer
 
@@ -19,11 +19,11 @@ class PublicIngredientsApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_login_required(self): 
+    def test_login_required(self):
         """Test that login is required to access the endpoint"""
         res = self.client.get(INGREDIENTS_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED) 
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateIngredientsApiTests(TestCase):
