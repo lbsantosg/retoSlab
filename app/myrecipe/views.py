@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from core.models import Tag
+from core.models import Tag, Ingredient
 from myrecipe import serializers
 
 
@@ -17,7 +17,7 @@ class TagViewSet(viewsets.GenericViewSet,
         might be some cases where you don't want to allow users to
         do everything and you don't need that feature so ther's no
         point implementing it. So, you can customize it by adding the
-        mixins for what you want to do. 
+        mixins for what you want to do.
     """
     authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, )
@@ -43,3 +43,14 @@ class TagViewSet(viewsets.GenericViewSet,
             we'd like to in our create process.
         """
         serializer.save(user=self.request.user)
+
+class IngredientViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    """Manage ingredientes in the db"""
+    authentication_classes = (TokenAuthentication,)
+    perission_classes = (IsAuthenticated,)
+    queryset = Ingredient.objects.all()
+    serializer_class = serializers.IngredientSerializer
+
+    def get_queryset(self):
+        """Return objects for the current authenticated user"""
+        return self.queryset.filter(user=self.request.user).order_by('-name')
