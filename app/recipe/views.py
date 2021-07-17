@@ -6,26 +6,29 @@ from core.models import Tag, Ingredient
 from recipe import serializers
 
 
-class TagViewSet(viewsets.GenericViewSet,
-                 mixins.ListModelMixin,
-                 mixins.CreateModelMixin):
-    """
-        Manage tags in the database
-        You can add mixins to customize the fucntionality that is
-        available for our viewset so you don't have to do the
-        standartd model viweset and accept everything because there
-        might be some cases where you don't want to allow users to
-        do everything and you don't need that feature so ther's no
-        point implementing it. So, you can customize it by adding the
-        mixins for what you want to do.
-    """
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
-    queryset = Tag.objects.all()
-    serializer_class = serializers.TagSerializer
+"""
+    Return objects for the current authenticated user only.
+    Manage attributes forn recipes in the db.
+    You can add mixins to customize the functionality that is
+    available for our viewset so you don't have to do the
+    standard model viweset and accept everything because there
+    might be some cases where you don't want to allow users to
+    do everything and you don't need that feature so ther's no
+    point implementing it. So, you can customize it by adding the
+    mixins for what you want to do.
+"""
+
+
+class BaseRecipeAttrViewSet(viewsets.GenericViewSet,
+                            mixins.ListModelMixin,
+                            mixins.CreateModelMixin):
+    """Base viewset for user owned recipe attributes"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        """Return objects for the current authenticated user only
+        """
+            Return objects for the current authenticated user only
             When the viewset is invoked from an url it will call
             get_query_set to retrieve these objects and this is
             where we can apply any custom filtering like limiting it
@@ -36,7 +39,7 @@ class TagViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         """
-            Create new tag.
+            Create a new object
             When we do a create object in our viewset this function will
             be invoked and the validated serializer will be in as a serializer
             argument and then we can perform any modifications here that
@@ -45,19 +48,13 @@ class TagViewSet(viewsets.GenericViewSet,
         serializer.save(user=self.request.user)
 
 
-class IngredientViewSet(viewsets.GenericViewSet,
-                        mixins.ListModelMixin,
-                        mixins.CreateModelMixin):
+class TagViewSet(BaseRecipeAttrViewSet):
+    """Manage tags in the database"""
+    queryset = Tag.objects.all()
+    serializer_class = serializers.TagSerializer
+
+
+class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in the database"""
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
     queryset = Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer
-
-    def get_queryset(self):
-        """Return objects for the current authenticated user only"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
-
-    def perform_create(self, serializer):
-        """Create new ingredient"""
-        serializer.save(user=self.request.user)
