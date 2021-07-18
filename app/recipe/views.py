@@ -70,3 +70,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieve the recipes for the authenticated user"""
         return self.queryset.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        """
+            This is the function that is called to retrieve the
+            serializer class for a particular request. Is this
+            funciton that you would use if you wanted to change
+            the serializer class for the different actions that
+            are available on the recipe viewset. 
+        """
+        if self.action == 'retrieve':
+            return serializers.RecipeDetailSerializer
+
+        return self.serializer_class

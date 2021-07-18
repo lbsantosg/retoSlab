@@ -38,3 +38,20 @@ class RecipeSerializer(serializers.ModelSerializer):
             'price', 'link',
         )
         read_only_fields = ('id',)
+
+
+class RecipeDetailSerializer(RecipeSerializer):
+    """
+        Serializer for the recipe detail.
+        With the Django rest framework you can nest serializers
+        inside each other, so we have one recipe detail serializer
+        and then the related key object returns the
+        ingredients objects wich can then be passed into our
+        ingredient serializer and use that to convert to this
+        type of object (IngredientSerializer)
+        many = True --> Many ingredientes asociated with a recipe
+        read_only = True --> You can't create a recipe by providing
+            these values because it's the only war it's goint to work
+    """
+    ingredients = IngredientSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
