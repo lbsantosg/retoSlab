@@ -77,7 +77,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer class for a particular request. Is this
             funciton that you would use if you wanted to change
             the serializer class for the different actions that
-            are available on the recipe viewset. 
+            are available on the recipe viewset.
         """
         if self.action == 'retrieve':
             return serializers.RecipeDetailSerializer
