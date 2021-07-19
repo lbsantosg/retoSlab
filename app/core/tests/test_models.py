@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core import models
@@ -73,3 +75,26 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(recipe), recipe.title)
+
+    @patch('uuid.uuid4')
+    def test_recipe_file_name_uuid(self, mock_uuid):
+        """
+            Test that image is saved in the correct location
+            Mock a value = any time we call the uuid for a function
+            that is triggered from within our test it will change
+            the value override the default behavior and just
+            return the value ('test-uuid') instead. This allow us
+            to reliably test how our function works.
+        """
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        # recipe image file path is the name of the function that
+        # we'll create and then ist's going to accepto 2 params
+        # 1. instance - not used
+        # 2. image original name (we need to remove the prior .jpg
+        #    and replace it with the uuid)
+        file_path = models.recipe_image_file_path(None, 'myimage.jpg')
+
+        # f --> String interpolation, insert variables inside a string
+        exp_path = f'uploads/recipe/{uuid}.jpg'
+        self.assertEqual(file_path, exp_path)
