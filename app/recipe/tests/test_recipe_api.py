@@ -1,3 +1,8 @@
+import tempfile
+import os
+
+from PIL import Image
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -13,6 +18,11 @@ RECIPES_URL = reverse('recipe:recipe-list')
 
 # /api/recipe/recipes/
 # /api/recipe/recipes/1/
+
+
+def image_upload_url(recipe_id):
+    """Return URL for recipe image upload"""
+    return reverse('recipe:recipe-upload-image', args=[recipe_id])
 
 
 def detail_url(recipe_id):
@@ -213,3 +223,49 @@ class PrivateRecipeApiTest(TestCase):
         self.assertEqual(recipe.price, payload['price'])
         tags = recipe.tags.all()
         self.assertEqual(len(tags), 0)
+
+
+class RecipeImageUploadTests(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'user@mail.com',
+            'testpass'
+        )
+        self.client.force_authenticate(self.user)
+        self.recipe = sample_recipe(user=self.user)
+
+    def tearDown(self):
+        """Properly remuves the test files after the test is over"""
+        self.recipe.image.delete()
+
+    def test_upload_image_to_recipe(self):
+        """Test uploading an image to recipe"""
+        url = image_upload_url(self.recipe.id)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format='JPEG')
+
+            # The seeking will be done to the end of the file, so if you try
+            # to access it then it would just be blank because you've already
+            # red up to the end of the file. Use this seek function to set the
+            # pointer back to the beginning of the file so then it's as if
+            # you've just opened it.
+            ntf.seek(0)
+            res = self.client.post(url, {'image': ntf}, format='multipart')
+            # We need to add format param to tell Django that we wanto to make
+            # a multi-part form request wich means a form that consists of
+            # data, by default it would just be a form that consists of a JSON.
+ 
+        self.recipe.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('image', res.data)
+        self.assertTrue(os.path.exists(self.recipe.image.path))
+
+    def test_upload_image_bad_request(self):
+        """Test uploading an invalid image"""
+        url = image_upload_url(self.recipe.id)
+        res = self.client.post(url, {'image': 'notimage'}, format='multipart')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
